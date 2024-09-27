@@ -27,6 +27,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, tick()
 				}
 			}
+		case "k", "up":
+			if !m.Chosen {
+				id := m.Choice.Id
+				newChoice := m.MenuChoices.GetChoiceById(id - 1)
+				if newChoice.Id != 0 {
+					m.Choice = newChoice
+					return m, tick()
+				} else {
+					return m, tick()
+				}
+			}
 
 		}
 		return m, tick()
