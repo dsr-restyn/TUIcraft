@@ -19,6 +19,7 @@ const (
 
 var (
 	keywordStyle         = lipgloss.NewStyle().Foreground(lipgloss.Color("211"))
+	inputStyle           = lipgloss.NewStyle().Foreground(lipgloss.Color(hotPink))
 	commonRarityStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("#918a90"))
 	uncommonRarityStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("#0588ed"))
 	rareRarityStyle      = lipgloss.NewStyle().Foreground(lipgloss.Color("#fcd112"))

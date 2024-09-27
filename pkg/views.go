@@ -15,8 +15,10 @@ func (m Model) View() string {
 
 	if !m.Chosen {
 		s = menuView(m)
+	} else if m.Choice.Name == "New Game" {
+		s = newGameView(m)
 	} else {
-		s = "Working on it..."
+		s = "You chose... wisely."
 	}
 
 	return mainStyle.Render("\n" + s + "\n\n")
@@ -40,7 +42,11 @@ func newGameView(m Model) string {
 	tpl := "New Game!\n\n"
 	tpl += "%s\n\n"
 	tpl += subtleStyle.Render(" Use j/k to select") + dotStyle + subtleStyle.Render("Press enter to confirm") + dotStyle + subtleStyle.Render("Press q, esc, or ctrl+c to quit")
-
+	textFields := []string{
+		inputStyle.Width(30).Render("Name: \n"),
+		inputStyle.Width(30).Render("Role: \n"),
+	}
+	return fmt.Sprintf(tpl, strings.Join(textFields, "\n"))
 }
 
 // func choicesView(m Model) string {
