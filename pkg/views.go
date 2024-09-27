@@ -19,19 +19,6 @@ func (m Model) View() string {
 		s = "Working on it..."
 	}
 
-	// if !m.MainChosen {
-	// 	s = menuView(m)
-	// 	return mainStyle.Render("\n" + s + "\n\n")
-	// }
-
-	// if !m.Chosen {
-	// 	s = choicesView(m)
-	// } else if m.Choice == 4 && m.Chosen {
-	// 	s = craftingView(m)
-	// } else {
-	// 	s = chosenView(m)
-	// }
-
 	return mainStyle.Render("\n" + s + "\n\n")
 }
 
@@ -47,6 +34,13 @@ func menuView(m Model) string {
 	}
 
 	return fmt.Sprintf(tpl, choices)
+}
+
+func newGameView(m Model) string {
+	tpl := "New Game!\n\n"
+	tpl += "%s\n\n"
+	tpl += subtleStyle.Render(" Use j/k to select") + dotStyle + subtleStyle.Render("Press enter to confirm") + dotStyle + subtleStyle.Render("Press q, esc, or ctrl+c to quit")
+
 }
 
 // func choicesView(m Model) string {

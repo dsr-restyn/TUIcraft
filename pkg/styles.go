@@ -9,6 +9,8 @@ import (
 )
 
 const (
+	hotPink           = lipgloss.Color("#FF06B7")
+	darkGray          = lipgloss.Color("#767676")
 	progressBarWidth  = 71
 	progressFullChar  = "█"
 	progressEmptyChar = "░"
@@ -28,6 +30,7 @@ var (
 	progressEmpty        = subtleStyle.Render(progressEmptyChar)
 	dotStyle             = lipgloss.NewStyle().Foreground(lipgloss.Color("236")).Render(dotChar)
 	mainStyle            = lipgloss.NewStyle().MarginLeft(2)
+	spinnerStyle         = lipgloss.NewStyle().Foreground(lipgloss.Color("63"))
 	// animatedStyle        = lipgloss.NewStyle().MarginLeft(2).Width(1)
 
 	// Gradient colors we'll use for the progress bar

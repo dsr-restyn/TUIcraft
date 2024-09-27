@@ -38,6 +38,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, tick()
 				}
 			}
+		case "enter":
+			if !m.Chosen {
+				m.Chosen = true
+				return m, tick()
+			}
 
 		}
 		return m, tick()
