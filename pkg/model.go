@@ -1,8 +1,11 @@
 package pkg
 
 import (
+	"encoding/json"
+	"os"
 	"time"
 
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -16,6 +19,12 @@ var (
 		"Epic",
 		"Legendary",
 	}
+)
+
+// Constants
+const (
+	Name = iota
+	Role
 )
 
 // Message types
@@ -35,6 +44,10 @@ type (
 	}
 
 	MenuChoices struct {
+		Choices []Choice
+	}
+
+	GameChoices struct {
 		Choices []Choice
 	}
 
@@ -79,8 +92,11 @@ type Model struct {
 	Loaded       bool
 	Quitting     bool
 	MenuChoices  MenuChoices
+	GameChoices  GameChoices
 	ItemTable    ItemTable
 	DroppedItems []Item
+	inputs       []textinput.Model
+	focused      int
 	Player       Player
 }
 
@@ -100,162 +116,96 @@ func (m Model) Init() tea.Cmd {
 	return tick()
 }
 
-// func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-// 	if msg, ok := msg.(tea.KeyMsg); ok {
-// 		k := msg.String()
-// 		if k == "q" || k == "esc" || k == "ctrl+c" {
-// 			m.Quitting = true
-// 			return m, tea.Quit
-// 		}
+func (m *Model) savePlayer() error {
+	file, err := os.Create("player_save.json")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
 
-// 		if k == "m" {
-// 			m.Chosen = false
-// 			m.Loaded = false
-// 			m.Progress = 0
-// 			m.Frames = 0
-// 			m.Ticks = 10
-// 			return m, tick()
-// 		}
-// 	}
+	encoder := json.NewEncoder(file)
+	return encoder.Encode(m.Player)
+}
 
-// 	if !m.Chosen {
-// 		return updateChoices(msg, m)
-// 	} else if m.Chosen && m.Choice == 4 {
-// 		return updateChoices(msg, m)
-// 	}
+func (m *Model) loadPlayer() error {
+	file, err := os.Open("player_save.json")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
 
-// 	return updateChosen(msg, m)
+	decoder := json.NewDecoder(file)
+	return decoder.Decode(&m.Player)
+}
 
-// }
+func (m *Model) InitPlayer() {
+	m.Player = Player{
+		Health:     20,
+		Mana:       5,
+		Level:      1,
+		Experience: 0,
+		Inventory:  []Item{},
+	}
+}
 
-// func updateChoices(msg tea.Msg, m Model) (tea.Model, tea.Cmd) {
-// 	switch msg := msg.(type) {
-// 	case tea.KeyMsg:
-// 		switch msg.String() {
-// 		case "j", "down":
-// 			if !m.MainChosen {
-// 				m.MainChoice++
-// 				if m.MainChoice > 1 {
-// 					m.MainChoice = 1
-// 				}
-// 				return m, frame()
-// 			}
-// 			if m.Chosen && m.Choice == 4 {
-// 				m.CraftChoice++
-// 				if m.CraftChoice > 2 {
-// 					m.CraftChoice = 2
-// 				}
+func InitalModel() Model {
+	initalItemTable := ItemTable{
+		Items: []Item{
+			{Name: "Crazy Orb", Desc: "Makes ya crazy!", SalePrice: 1000},
+			{Name: "Magic Sword", Desc: "Slice and Dice", SalePrice: 500},
+			{Name: "Golden Key", Desc: "Must open a Golden Door", SalePrice: 250},
+			{Name: "Rusty Dagger", Desc: "Like a nice dagger, except rusty", SalePrice: 50},
+			{Name: "Shiny Shield", Desc: "You can see your face in it", SalePrice: 100},
+			{Name: "Old Book", Desc: "Dusty", SalePrice: 25},
+			{Name: "Strange Potion", Desc: "What IS a normal potion?", SalePrice: 200},
+			{Name: "Silver Coin", Desc: "Not a gold coin", SalePrice: 10},
+		},
+	}
 
-// 			} else {
-// 				m.Choice++
-// 				if m.Choice > 5 {
-// 					m.Choice = 5
-// 				}
-// 			}
+	initalMenuChoices := MenuChoices{
+		Choices: []Choice{
+			{Name: "New Game", Id: 1},
+			{Name: "Load Game", Id: 2},
+		},
+	}
 
-// 		case "k", "up":
-// 			if !m.MainChosen {
-// 				m.MainChoice--
-// 				if m.MainChoice < 0 {
-// 					m.MainChoice = 0
-// 				}
-// 				return m, frame()
-// 			}
-// 			if m.Chosen && m.Choice == 4 {
-// 				m.CraftChoice--
-// 				if m.CraftChoice < 0 {
-// 					m.CraftChoice = 0
-// 				}
-// 			} else {
-// 				m.Choice--
-// 				if m.Choice < 0 {
-// 					m.Choice = 0
-// 				}
-// 			}
+	initalGameChoices := GameChoices{
+		Choices: []Choice{
+			{Name: "Wander Around", Id: 0},
+			{Name: "Fight Some Stuff", Id: 1},
+			{Name: "Talk to a Stranger", Id: 2},
+			{Name: "Take a Nap", Id: 3},
+			{Name: "Craft", Id: 4},
+			{Name: "View Inventory", Id: 5},
+		},
+	}
 
-// 		case "enter":
-// 			if !m.MainChosen {
-// 				m.MainChosen = true
-// 				return m, frame()
-// 			}
-// 			if m.Choice == 4 && m.Chosen {
-// 				m.CraftChosen = true
-// 				return m, frame()
-// 			} else {
-// 				m.Chosen = true
-// 				return m, frame()
-// 			}
-// 		}
+	var inputs []textinput.Model = make([]textinput.Model, 2)
+	inputs[Name] = textinput.New()
+	inputs[Name].Placeholder = ""
+	inputs[Name].Focus()
+	inputs[Name].Prompt = ""
+	inputs[Name].Width = 5
+	inputs[Name].CharLimit = 10
+	inputs[Role] = textinput.New()
+	inputs[Role].Placeholder = ""
+	inputs[Role].Prompt = ""
+	inputs[Role].Width = 5
+	inputs[Role].CharLimit = 10
 
-// 	case tickMsg:
-// 		if m.Chosen && m.Choice == 4 {
-// 			if m.Ticks == 0 {
-// 				m.CraftChosen = true
-// 				return m, tick()
-// 			}
-// 		}
-// 		if m.Ticks == 0 {
-// 			m.Chosen = true
-// 			m.Ticks = 10
-// 			return m, tick()
-// 		}
-// 		m.Ticks--
-// 		return m, tick()
-// 	}
-
-// 	return m, nil
-// }
-
-// func updateChosen(msg tea.Msg, m Model) (tea.Model, tea.Cmd) {
-// 	switch msg.(type) {
-// 	case frameMsg:
-// 		if !m.Loaded {
-// 			divisor := 100
-// 			m.Frames++
-// 			if m.Choice == 0 {
-// 				divisor = 1000
-// 				m.Progress = ease.Linear(float64(m.Frames) / float64(divisor))
-// 			} else if m.Choice == 4 || m.Choice == 5 {
-// 				m.Progress = 0
-// 			} else {
-// 				m.Progress = ease.OutBounce(float64(m.Frames) / float64(divisor))
-// 			}
-// 			if m.Progress >= 1 {
-// 				m.Progress = 1
-// 				m.Loaded = true
-// 				m.Ticks = 3
-// 				if m.Choice == 0 {
-// 					rand.New(rand.NewSource(time.Now().UnixNano()))
-// 					item_1 := rand.Intn(len(m.ItemTable.Items))
-// 					item_2 := rand.Intn(len(m.ItemTable.Items))
-// 					item_3 := rand.Intn(len(m.ItemTable.Items))
-// 					rarity_1 := rarities[rand.Intn(len(rarities))]
-// 					rarity_2 := rarities[rand.Intn(len(rarities))]
-// 					rarity_3 := rarities[rand.Intn(len(rarities))]
-// 					m.ItemTable.Items[item_1].Rarity = rarity_1
-// 					m.ItemTable.Items[item_2].Rarity = rarity_2
-// 					m.ItemTable.Items[item_3].Rarity = rarity_3
-// 					m.DroppedItems = []Item{m.ItemTable.Items[item_1], m.ItemTable.Items[item_2], m.ItemTable.Items[item_3]}
-// 					m.Player.Inventory = append(m.Player.Inventory, m.DroppedItems...)
-// 				}
-// 				return m, tick()
-// 			}
-// 		}
-// 	case tickMsg:
-// 		if m.Loaded {
-// 			if m.Ticks == 0 {
-// 				m.Chosen = false
-// 				m.Loaded = false
-// 				m.Progress = 0
-// 				m.Frames = 0
-// 				m.Ticks = 10
-// 				return m, tick()
-// 			}
-// 			m.Ticks--
-// 			return m, tick()
-// 		} else {
-// 			m.Ticks--
-// 		}
-// 	}
-// 	return m, frame()
-// }
+	return Model{
+		Choice:      initalMenuChoices.Choices[0],
+		Chosen:      false,
+		Ticks:       10,
+		Frames:      0,
+		Progress:    0,
+		Loaded:      false,
+		Quitting:    false,
+		MenuChoices: initalMenuChoices,
+		GameChoices: initalGameChoices,
+		ItemTable:   initalItemTable,
+		Player:      Player{},
+		inputs:      inputs,
+		focused:     0,
+	}
+}
