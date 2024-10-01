@@ -19,14 +19,39 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	if !m.Chosen {
-		return m.updateChoices(msg)
-	} else if m.Choice.Name == "New Game" {
-		return m.updateInputs(msg)
-	}
+	if m.Player.Name == "" {
+		if !m.Chosen {
+			return m.updateChoices(msg)
+		} else {
+			switch m.Choice.Name {
+			case "New Game":
+				return m.updateInputs(msg)
+			case "Load Game":
+				m.loadPlayer()
+				m.Chosen = false
+				m.Choice = m.GameChoices.Choices.GetChoiceById(1)
+				return m.updateChoices(msg)
+			}
+		}
 
+	} else {
+		if m.MenuChoices.Choices.contains(m.Choice) {
+			m.Choice = m.GameChoices.Choices.GetChoiceById(1)
+			return m.updateChoices(msg)
+		}
+		return m.updateChoices(msg)
+	}
 	return m, nil
 }
+
+// if !m.Chosen {
+// 	return m.updateChoices(msg)
+// } else if m.Choice.Name == "New Game" {
+// 	return m.updateInputs(msg)
+// }
+
+// 	return m, nil
+// }
 
 func (m Model) updateInputs(msg tea.Msg) (Model, tea.Cmd) {
 	var cmds []tea.Cmd = make([]tea.Cmd, len(m.inputs))
@@ -67,6 +92,7 @@ func (m Model) updateInputs(msg tea.Msg) (Model, tea.Cmd) {
 func (m Model) updateChoices(msg tea.Msg) (Model, tea.Cmd) {
 	c := m.Choice
 	inMenu := m.MenuChoices.Choices.contains(c)
+	log.Printf("In menu: %v", inMenu)
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {

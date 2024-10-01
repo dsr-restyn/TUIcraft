@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"strings"
 )
@@ -13,16 +14,30 @@ func (m Model) View() string {
 		return s
 	}
 
-	if !m.Chosen {
-		s = menuChoicesView(m)
-	} else {
-		switch m.Choice.Name {
-		case "New Game":
-			s = newGameView(m)
-		case "Load Game":
-			s = gameChoicesView(m)
+	if m.Player.Name == "" {
+		if !m.Chosen {
+			s = menuChoicesView(m)
+		} else {
+			switch m.Choice.Name {
+			case "New Game":
+				s = newGameView(m)
+			case "Load Game":
+				log.Print("Loading game, going back to menu to check for player name...")
+				s = menuChoicesView(m)
+			}
 		}
+	} else {
+		log.Print("Player name found, showing game choices...")
+		s = gameChoicesView(m)
 	}
+
+	// if !m.Chosen {
+	// 	s = menuChoicesView(m)
+	// } else if m.Choice.Name == "New Game" {
+	// 	s = newGameView(m)
+	// } else if m.Choice.Name == "Load Game" {
+	// 	s = gameChoicesView(m)
+	// }
 
 	return mainStyle.Render("\n" + s + "\n\n")
 }
