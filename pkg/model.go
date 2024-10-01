@@ -43,12 +43,16 @@ type (
 		Id   int
 	}
 
+	Choices struct {
+		ChoicesSlice []Choice
+	}
+
 	MenuChoices struct {
-		Choices []Choice
+		Choices Choices
 	}
 
 	GameChoices struct {
-		Choices []Choice
+		Choices Choices
 	}
 
 	Item struct {
@@ -73,8 +77,26 @@ type (
 	}
 )
 
-func (mc MenuChoices) GetChoiceById(id int) Choice {
-	for _, choice := range mc.Choices {
+func (cs Choices) contains(choice Choice) bool {
+	for _, c := range cs.ChoicesSlice {
+		if c == choice {
+			return true
+		}
+	}
+	return false
+}
+
+func (cs Choices) GetChoiceByName(name string) Choice {
+	for _, choice := range cs.ChoicesSlice {
+		if choice.Name == name {
+			return choice
+		}
+	}
+	return Choice{}
+}
+
+func (cs Choices) GetChoiceById(id int) Choice {
+	for _, choice := range cs.ChoicesSlice {
 		if choice.Id == id {
 			return choice
 		}
@@ -163,20 +185,24 @@ func InitalModel() Model {
 	}
 
 	initalMenuChoices := MenuChoices{
-		Choices: []Choice{
-			{Name: "New Game", Id: 1},
-			{Name: "Load Game", Id: 2},
+		Choices: Choices{
+			[]Choice{
+				{Name: "New Game", Id: 1},
+				{Name: "Load Game", Id: 2},
+			},
 		},
 	}
 
 	initalGameChoices := GameChoices{
-		Choices: []Choice{
-			{Name: "Wander Around", Id: 0},
-			{Name: "Fight Some Stuff", Id: 1},
-			{Name: "Talk to a Stranger", Id: 2},
-			{Name: "Take a Nap", Id: 3},
-			{Name: "Craft", Id: 4},
-			{Name: "View Inventory", Id: 5},
+		Choices: Choices{
+			[]Choice{
+				{Name: "Wander Around", Id: 0},
+				{Name: "Fight Some Stuff", Id: 1},
+				{Name: "Talk to a Stranger", Id: 2},
+				{Name: "Take a Nap", Id: 3},
+				{Name: "Craft", Id: 4},
+				{Name: "View Inventory", Id: 5},
+			},
 		},
 	}
 
@@ -194,7 +220,7 @@ func InitalModel() Model {
 	inputs[Role].CharLimit = 10
 
 	return Model{
-		Choice:      initalMenuChoices.Choices[0],
+		Choice:      initalMenuChoices.Choices.ChoicesSlice[0],
 		Chosen:      false,
 		Ticks:       10,
 		Frames:      0,

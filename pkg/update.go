@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"log"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -40,6 +41,9 @@ func (m Model) updateInputs(msg tea.Msg) (Model, tea.Cmd) {
 					if err := m.savePlayer(); err != nil {
 						fmt.Println("Error saving player:", err)
 					}
+					m.loadPlayer()
+					m.Chosen = false
+					log.Printf("Player: %v", m.Player)
 				}
 			case tea.KeyShiftTab, tea.KeyCtrlP:
 				m.inputs[m.focused].Blur()
@@ -56,25 +60,36 @@ func (m Model) updateInputs(msg tea.Msg) (Model, tea.Cmd) {
 			m.inputs[i], cmds[i] = m.inputs[i].Update(msg)
 		}
 
-	} else if m.Chosen && m.Choice.Name == "Load Game" {
-		m.loadPlayer()
 	}
 	return m, tick()
 }
 
 func (m Model) updateChoices(msg tea.Msg) (Model, tea.Cmd) {
+	c := m.Choice
+	inMenu := m.MenuChoices.Choices.contains(c)
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "j", "down":
-			m.nextMenuChoice()
+			if inMenu {
+				m.nextChoice(m.MenuChoices.Choices)
+			} else {
+				m.nextChoice(m.GameChoices.Choices)
+			}
 		case "k", "up":
-			m.previousMenuChoice()
+			if inMenu {
+				m.previousChoice(m.MenuChoices.Choices)
+			} else {
+				m.previousChoice(m.GameChoices.Choices)
+			}
 		case "q", "esc", "ctrl+c":
 			m.Quitting = true
 			return m, tea.Quit
 		case "enter":
 			m.Chosen = true
+			if m.Choice.Name == "Load Game" {
+				m.loadPlayer()
+			}
 		}
 	}
 	return m, tick()
@@ -98,20 +113,20 @@ func (m *Model) prevInput() {
 	}
 }
 
-func (m *Model) nextMenuChoice() {
+func (m *Model) nextChoice(choices Choices) {
 	c := m.Choice.Id
-	newChoice := m.MenuChoices.GetChoiceById(c + 1)
+	newChoice := choices.GetChoiceById(c + 1)
 	if newChoice.Id == 0 {
-		newChoice = m.MenuChoices.Choices[0]
+		newChoice = choices.ChoicesSlice[0]
 	}
 	m.Choice = newChoice
 }
 
-func (m *Model) previousMenuChoice() {
+func (m *Model) previousChoice(choices Choices) {
 	c := m.Choice.Id
-	newChoice := m.MenuChoices.GetChoiceById(c - 1)
+	newChoice := choices.GetChoiceById(c - 1)
 	if newChoice.Id == 0 {
-		newChoice = m.MenuChoices.Choices[len(m.MenuChoices.Choices)-1]
+		newChoice = choices.ChoicesSlice[len(choices.ChoicesSlice)-1]
 	}
 	m.Choice = newChoice
 }

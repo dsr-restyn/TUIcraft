@@ -15,10 +15,13 @@ func (m Model) View() string {
 
 	if !m.Chosen {
 		s = menuChoicesView(m)
-	} else if m.Choice.Name == "New Game" {
-		s = newGameView(m)
-	} else if m.Choice.Name == "Load Game" {
-		s = gameChoicesView(m)
+	} else {
+		switch m.Choice.Name {
+		case "New Game":
+			s = newGameView(m)
+		case "Load Game":
+			s = gameChoicesView(m)
+		}
 	}
 
 	return mainStyle.Render("\n" + s + "\n\n")
@@ -30,7 +33,7 @@ func menuChoicesView(m Model) string {
 	tpl += subtleStyle.Render(" Use j/k to select") + dotStyle + subtleStyle.Render("Press enter to confirm") + dotStyle + subtleStyle.Render("Press q, esc, or ctrl+c to quit")
 	c := m.Choice.Id
 	var choices string
-	for _, choice := range m.MenuChoices.Choices {
+	for _, choice := range m.MenuChoices.Choices.ChoicesSlice {
 		choices += "\n"
 		choices += checkbox(choice.Name, c == choice.Id)
 	}
@@ -60,7 +63,7 @@ func gameChoicesView(m Model) string {
 	tpl += subtleStyle.Render(" Use j/k to select") + dotStyle + subtleStyle.Render("Press enter to confirm") + dotStyle + subtleStyle.Render("Press q, esc, or ctrl+c to quit")
 
 	var choices string
-	for _, choice := range m.GameChoices.Choices {
+	for _, choice := range m.GameChoices.Choices.ChoicesSlice {
 		choices += "\n"
 		choices += checkbox(choice.Name, c.Id == choice.Id)
 	}
