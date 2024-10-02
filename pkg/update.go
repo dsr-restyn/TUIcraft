@@ -29,14 +29,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "Load Game":
 				m.loadPlayer()
 				m.Chosen = false
-				m.Choice = m.GameChoices.Choices.GetChoiceById(1)
+				m.Choice = m.GameChoices.Choices.ChoicesSlice[0]
 				return m.updateChoices(msg)
 			}
 		}
 
 	} else {
 		if m.MenuChoices.Choices.contains(m.Choice) {
-			m.Choice = m.GameChoices.Choices.GetChoiceById(1)
+			m.Choice = m.GameChoices.Choices.ChoicesSlice[0]
 			return m.updateChoices(msg)
 		}
 		return m.updateChoices(msg)
