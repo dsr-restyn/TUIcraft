@@ -115,6 +115,7 @@ func (m Model) updateChoices(msg tea.Msg) (Model, tea.Cmd) {
 			m.Chosen = true
 			if m.Choice.Name == "Load Game" {
 				m.loadPlayer()
+				m.Chosen = false
 			}
 		}
 	}
