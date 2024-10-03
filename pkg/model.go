@@ -77,6 +77,10 @@ type (
 	}
 )
 
+func (p Player) IsLoaded() bool {
+	return p.Name != "" && p.Role != ""
+}
+
 func (cs Choices) contains(choice Choice) bool {
 	for _, c := range cs.ChoicesSlice {
 		if c == choice {
@@ -160,6 +164,42 @@ func (m *Model) loadPlayer() error {
 	return decoder.Decode(&m.Player)
 }
 
+// nextInput focuses the next input field
+func (m *Model) nextInput() {
+	m.focused++
+	// Wrap around
+	if m.focused >= len(m.inputs) {
+		m.focused = 0
+	}
+}
+
+// prevInput focuses the previous input field
+func (m *Model) prevInput() {
+	m.focused--
+	// Wrap around
+	if m.focused < 0 {
+		m.focused = len(m.inputs) - 1
+	}
+}
+
+func (m *Model) nextChoice(choices Choices) {
+	c := m.Choice.Id
+	newChoice := choices.GetChoiceById(c + 1)
+	if newChoice.Id == 0 {
+		newChoice = choices.ChoicesSlice[0]
+	}
+	m.Choice = newChoice
+}
+
+func (m *Model) previousChoice(choices Choices) {
+	c := m.Choice.Id
+	newChoice := choices.GetChoiceById(c - 1)
+	if newChoice.Id == 0 {
+		newChoice = choices.ChoicesSlice[len(choices.ChoicesSlice)-1]
+	}
+	m.Choice = newChoice
+}
+
 func (m *Model) InitPlayer() {
 	m.Player = Player{
 		Health:     20,
@@ -196,12 +236,12 @@ func InitalModel() Model {
 	initalGameChoices := GameChoices{
 		Choices: Choices{
 			[]Choice{
-				{Name: "Wander Around", Id: 0},
-				{Name: "Fight Some Stuff", Id: 1},
-				{Name: "Talk to a Stranger", Id: 2},
-				{Name: "Take a Nap", Id: 3},
-				{Name: "Craft", Id: 4},
-				{Name: "View Inventory", Id: 5},
+				{Name: "Wander Around", Id: 1},
+				{Name: "Fight Some Stuff", Id: 2},
+				{Name: "Talk to a Stranger", Id: 3},
+				{Name: "Take a Nap", Id: 4},
+				{Name: "Craft", Id: 5},
+				{Name: "View Inventory", Id: 6},
 			},
 		},
 	}
@@ -211,12 +251,12 @@ func InitalModel() Model {
 	inputs[Name].Placeholder = ""
 	inputs[Name].Focus()
 	inputs[Name].Prompt = ""
-	inputs[Name].Width = 5
+	inputs[Name].Width = 11
 	inputs[Name].CharLimit = 10
 	inputs[Role] = textinput.New()
 	inputs[Role].Placeholder = ""
 	inputs[Role].Prompt = ""
-	inputs[Role].Width = 5
+	inputs[Role].Width = 11
 	inputs[Role].CharLimit = 10
 
 	return Model{

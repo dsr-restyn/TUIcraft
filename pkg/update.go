@@ -44,15 +44,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-// if !m.Chosen {
-// 	return m.updateChoices(msg)
-// } else if m.Choice.Name == "New Game" {
-// 	return m.updateInputs(msg)
-// }
-
-// 	return m, nil
-// }
-
 func (m Model) updateInputs(msg tea.Msg) (Model, tea.Cmd) {
 	var cmds []tea.Cmd = make([]tea.Cmd, len(m.inputs))
 	if m.Chosen && m.Choice.Name == "New Game" {
@@ -90,6 +81,7 @@ func (m Model) updateInputs(msg tea.Msg) (Model, tea.Cmd) {
 }
 
 func (m Model) updateChoices(msg tea.Msg) (Model, tea.Cmd) {
+	// TODO: Figure out more elegant way to handle player load state
 	c := m.Choice
 	inMenu := m.MenuChoices.Choices.contains(c)
 	log.Printf("In menu: %v", inMenu)
@@ -108,52 +100,18 @@ func (m Model) updateChoices(msg tea.Msg) (Model, tea.Cmd) {
 			} else {
 				m.previousChoice(m.GameChoices.Choices)
 			}
+		case "m":
+			m.Chosen = false
 		case "q", "esc", "ctrl+c":
 			m.Quitting = true
 			return m, tea.Quit
 		case "enter":
 			m.Chosen = true
-			if m.Choice.Name == "Load Game" {
+			if m.Choice.Name == "Load Game" && !m.Player.IsLoaded() {
 				m.loadPlayer()
 				m.Chosen = false
 			}
 		}
 	}
 	return m, tick()
-}
-
-// nextInput focuses the next input field
-func (m *Model) nextInput() {
-	m.focused++
-	// Wrap around
-	if m.focused >= len(m.inputs) {
-		m.focused = 0
-	}
-}
-
-// prevInput focuses the previous input field
-func (m *Model) prevInput() {
-	m.focused--
-	// Wrap around
-	if m.focused < 0 {
-		m.focused = len(m.inputs) - 1
-	}
-}
-
-func (m *Model) nextChoice(choices Choices) {
-	c := m.Choice.Id
-	newChoice := choices.GetChoiceById(c + 1)
-	if newChoice.Id == 0 {
-		newChoice = choices.ChoicesSlice[0]
-	}
-	m.Choice = newChoice
-}
-
-func (m *Model) previousChoice(choices Choices) {
-	c := m.Choice.Id
-	newChoice := choices.GetChoiceById(c - 1)
-	if newChoice.Id == 0 {
-		newChoice = choices.ChoicesSlice[len(choices.ChoicesSlice)-1]
-	}
-	m.Choice = newChoice
 }
