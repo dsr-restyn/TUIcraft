@@ -180,5 +180,5 @@ func (m Model) updateChosen(msg tea.Msg) (Model, tea.Cmd) {
 			m.Ticks--
 		}
 	}
-	return m, tick()
+	return m, frame()
 }
