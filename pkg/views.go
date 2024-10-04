@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"strings"
 )
@@ -22,12 +21,10 @@ func (m Model) View() string {
 			case "New Game":
 				s = newGameView(m)
 			case "Load Game":
-				log.Print("Loading game, going back to menu to check for player name...")
 				s = menuChoicesView(m)
 			}
 		}
 	} else {
-		log.Print("Player name found, showing game choices...")
 		if !m.Chosen {
 			s = gameChoicesView(m)
 		} else {
@@ -113,15 +110,17 @@ func chosenView(m Model) string {
 			msg = "You do something. It's a good something."
 		}
 		if m.Loaded {
-			msg += "\n\n" + label + "\n\n" + done
+			label = fmt.Sprintf("%s, returning to menu in %s seconds...", done, ticksStyle.Render(fmt.Sprintf("%d", m.Ticks)))
+			return msg + "\n\n" + label + "\n\n" + progressbar(m.Progress) + "%"
 		} else {
 			msg += "\n\n" + subtleStyle.Render("Loading...") + dotStyle
+			return msg + "\n\n" + label + "\n\n" + progressbar(m.Progress) + "%"
+
 		}
 	} else {
 		return menuChoicesView(m)
 	}
 
-	return msg
 }
 
 func checkbox(label string, checked bool) string {

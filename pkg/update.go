@@ -3,8 +3,11 @@ package pkg
 import (
 	"fmt"
 	"log"
+	"math/rand"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/fogleman/ease"
 )
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -24,7 +27,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	if m.Player.Name == "" {
+	if !m.Player.IsLoaded() {
 		if !m.Chosen {
 			return m.updateChoices(msg)
 		} else {
@@ -43,10 +46,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.MenuChoices.Choices.contains(m.Choice) {
 			m.Choice = m.GameChoices.Choices.ChoicesSlice[0]
 			return m.updateChoices(msg)
-		} else if m.GameChoices.Choices.contains(m.Choice) && m.Chosen {
-
+		} else {
+			if !m.Chosen {
+				return m.updateChoices(msg)
+			} else {
+				return m.updateChosen(msg)
+			}
 		}
-		return m.updateChoices(msg)
 	}
 	return m, nil
 }
@@ -66,7 +72,6 @@ func (m Model) updateInputs(msg tea.Msg) (Model, tea.Cmd) {
 					}
 					m.loadPlayer()
 					m.Chosen = false
-					log.Printf("Player: %v", m.Player)
 				}
 			case tea.KeyShiftTab, tea.KeyCtrlP:
 				m.inputs[m.focused].Blur()
@@ -91,7 +96,6 @@ func (m Model) updateChoices(msg tea.Msg) (Model, tea.Cmd) {
 	// TODO: Figure out more elegant way to handle player load state
 	c := m.Choice
 	inMenu := m.MenuChoices.Choices.contains(c)
-	log.Printf("In menu: %v", inMenu)
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -100,15 +104,15 @@ func (m Model) updateChoices(msg tea.Msg) (Model, tea.Cmd) {
 				m.nextChoice(m.MenuChoices.Choices)
 			} else {
 				m.nextChoice(m.GameChoices.Choices)
+				return m, frame()
 			}
 		case "k", "up":
 			if inMenu {
 				m.previousChoice(m.MenuChoices.Choices)
 			} else {
 				m.previousChoice(m.GameChoices.Choices)
+				return m, frame()
 			}
-		case "m":
-			m.Chosen = false
 		case "q", "esc", "ctrl+c":
 			m.Quitting = true
 			return m, tea.Quit
@@ -118,12 +122,63 @@ func (m Model) updateChoices(msg tea.Msg) (Model, tea.Cmd) {
 				m.loadPlayer()
 				m.Chosen = false
 			}
+			return m, frame()
 		}
+	case tickMsg:
+		m.Ticks--
+		if m.Ticks <= 0 {
+			m.Chosen = true
+			m.Ticks = 10
+		}
+		return m, tick()
 	}
-	return m, tick()
+	return m, nil
 }
 
 func (m Model) updateChosen(msg tea.Msg) (Model, tea.Cmd) {
-
+	switch msg.(type) {
+	case frameMsg:
+		log.Printf("frameMsg received: %d", m.Frames)
+		if !m.Loaded {
+			divisor := 100
+			m.Frames++
+			m.Progress = ease.OutBounce(float64(m.Frames) / float64(divisor))
+			if m.Progress >= 1 {
+				m.Progress = 1
+				m.Loaded = true
+				m.Ticks = 3
+				if m.Choice.Name == "" {
+					rand.New(rand.NewSource(time.Now().UnixNano()))
+					item_1 := rand.Intn(len(m.ItemTable.Items))
+					item_2 := rand.Intn(len(m.ItemTable.Items))
+					item_3 := rand.Intn(len(m.ItemTable.Items))
+					rarity_1 := rarities[rand.Intn(len(rarities))]
+					rarity_2 := rarities[rand.Intn(len(rarities))]
+					rarity_3 := rarities[rand.Intn(len(rarities))]
+					m.ItemTable.Items[item_1].Rarity = rarity_1
+					m.ItemTable.Items[item_2].Rarity = rarity_2
+					m.ItemTable.Items[item_3].Rarity = rarity_3
+					m.DroppedItems = []Item{m.ItemTable.Items[item_1], m.ItemTable.Items[item_2], m.ItemTable.Items[item_3]}
+					m.Player.Inventory = append(m.Player.Inventory, m.DroppedItems...)
+				}
+				return m, tick()
+			}
+		}
+	case tickMsg:
+		if m.Loaded {
+			if m.Ticks == 0 {
+				m.Chosen = false
+				m.Loaded = false
+				m.Progress = 0
+				m.Frames = 0
+				m.Ticks = 10
+				return m, tick()
+			}
+			m.Ticks--
+			return m, tick()
+		} else {
+			m.Ticks--
+		}
+	}
 	return m, tick()
 }
