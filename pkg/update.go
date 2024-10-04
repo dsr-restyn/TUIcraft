@@ -16,6 +16,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.Quitting = true
 				return m, tea.Quit
 			}
+
+			if k == "m" {
+				m.Chosen = false
+				return m.updateChoices(msg)
+			}
 		}
 	}
 
@@ -38,6 +43,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.MenuChoices.Choices.contains(m.Choice) {
 			m.Choice = m.GameChoices.Choices.ChoicesSlice[0]
 			return m.updateChoices(msg)
+		} else if m.GameChoices.Choices.contains(m.Choice) && m.Chosen {
+
 		}
 		return m.updateChoices(msg)
 	}
@@ -113,5 +120,10 @@ func (m Model) updateChoices(msg tea.Msg) (Model, tea.Cmd) {
 			}
 		}
 	}
+	return m, tick()
+}
+
+func (m Model) updateChosen(msg tea.Msg) (Model, tea.Cmd) {
+
 	return m, tick()
 }

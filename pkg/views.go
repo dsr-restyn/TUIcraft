@@ -28,7 +28,11 @@ func (m Model) View() string {
 		}
 	} else {
 		log.Print("Player name found, showing game choices...")
-		s = gameChoicesView(m)
+		if !m.Chosen {
+			s = gameChoicesView(m)
+		} else {
+			s = chosenView(m)
+		}
 	}
 
 	// if !m.Chosen {
@@ -84,6 +88,40 @@ func gameChoicesView(m Model) string {
 	}
 
 	return fmt.Sprintf(tpl, m.Player.Name, choices, ticksStyle.Render(fmt.Sprintf("%d", m.Ticks)))
+}
+
+func chosenView(m Model) string {
+	var msg string
+	label := m.Choice.Name
+	done := "Done!"
+
+	if m.GameChoices.Choices.contains(m.Choice) {
+		switch m.Choice.Name {
+		case "Wander Around":
+			msg = "You wander around the forest, looking for adventure."
+		case "Fight Some Stuff":
+			msg = "You fight some stuff. It's a good time."
+		case "Talk to a Stranger":
+			msg = "You talk to a stranger. They're strange."
+		case "Take a Nap":
+			msg = "You take a nap. It's a good nap."
+		case "Craft":
+			msg = "You craft something. It's a good craft."
+		case "View Inventory":
+			msg = "You view your inventory. It's a good inventory."
+		default:
+			msg = "You do something. It's a good something."
+		}
+		if m.Loaded {
+			msg += "\n\n" + label + "\n\n" + done
+		} else {
+			msg += "\n\n" + subtleStyle.Render("Loading...") + dotStyle
+		}
+	} else {
+		return menuChoicesView(m)
+	}
+
+	return msg
 }
 
 func checkbox(label string, checked bool) string {
