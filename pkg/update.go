@@ -128,7 +128,7 @@ func (m Model) updateChoices(msg tea.Msg) (Model, tea.Cmd) {
 		m.Ticks--
 		if m.Ticks <= 0 {
 			m.Chosen = true
-			m.Ticks = 10
+			m.Ticks = 100
 		}
 		return m, tick()
 	}
@@ -171,7 +171,7 @@ func (m Model) updateChosen(msg tea.Msg) (Model, tea.Cmd) {
 				m.Loaded = false
 				m.Progress = 0
 				m.Frames = 0
-				m.Ticks = 10
+				m.Ticks = 100
 				return m, tick()
 			}
 			m.Ticks--
