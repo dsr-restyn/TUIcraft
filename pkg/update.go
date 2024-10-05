@@ -93,7 +93,8 @@ func (m Model) updateInputs(msg tea.Msg) (Model, tea.Cmd) {
 		}
 
 	}
-	return m, tick()
+	// return m, tick()
+	return m, tea.Batch(cmds...)
 }
 
 func (m Model) updateChoices(msg tea.Msg) (Model, tea.Cmd) {
