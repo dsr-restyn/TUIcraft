@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 	"strings"
+
+	"github.com/charmbracelet/lipgloss"
 )
 
 func (m Model) View() string {
@@ -31,15 +33,6 @@ func (m Model) View() string {
 			s = chosenView(m)
 		}
 	}
-
-	// if !m.Chosen {
-	// 	s = menuChoicesView(m)
-	// } else if m.Choice.Name == "New Game" {
-	// 	s = newGameView(m)
-	// } else if m.Choice.Name == "Load Game" {
-	// 	s = gameChoicesView(m)
-	// }
-
 	return mainStyle.Render("\n" + s + "\n\n")
 }
 
@@ -95,7 +88,18 @@ func chosenView(m Model) string {
 	if m.GameChoices.Choices.contains(m.Choice) {
 		switch m.Choice.Name {
 		case "Wander Around":
-			msg = "You wander around the forest, looking for adventure."
+			msg = "Wandering around...\n\n"
+			label = "Wandering..."
+			if len(m.DroppedItems) == 3 {
+				done = fmt.Sprintf("You found a %s %s, a %s %s, and a %s %s!",
+					renderRarity(m.DroppedItems[0].Rarity),
+					keywordStyle.Render(m.DroppedItems[0].Name),
+					renderRarity(m.DroppedItems[1].Rarity),
+					keywordStyle.Render(m.DroppedItems[1].Name),
+					renderRarity(m.DroppedItems[2].Rarity),
+					keywordStyle.Render(m.DroppedItems[2].Name),
+				)
+			}
 		case "Fight Some Stuff":
 			msg = "You fight some stuff. It's a good time."
 		case "Talk to a Stranger":
@@ -105,12 +109,19 @@ func chosenView(m Model) string {
 		case "Craft":
 			msg = "You craft something. It's a good craft."
 		case "View Inventory":
-			msg = "You view your inventory. It's a good inventory."
+			label = "Viewing Inventory...\n\n"
+			var items []string
+			for _, item := range m.Player.Inventory {
+				items = append(items, fmt.Sprintf("%s %s\n%s", renderRarity(item.Rarity), keywordStyle.Render(item.Name), subtleStyle.Render(item.Desc)))
+			}
+			msg = "Inventory: \n\n" + strings.Join(items, "\n")
+			m.Loaded = true
+			m.Ticks = 500
 		default:
 			msg = "You do something. It's a good something."
 		}
 		if m.Loaded {
-			label = fmt.Sprintf("%s, returning to menu in %s seconds...", done, ticksStyle.Render(fmt.Sprintf("%d", m.Ticks)))
+			label = fmt.Sprintf("\n%s, returning to menu in %s seconds...", done, ticksStyle.Render(fmt.Sprintf("%d", m.Ticks)))
 			return msg + "\n\n" + label + "\n\n" + progressbar(m.Progress) + "%"
 		} else {
 			msg += "\n\n" + subtleStyle.Render("Loading...") + dotStyle
@@ -121,6 +132,23 @@ func chosenView(m Model) string {
 		return menuChoicesView(m)
 	}
 
+}
+
+func renderRarity(rarity string) string {
+	switch rarity {
+	case "Common":
+		return commonRarityStyle.Render(rarity)
+	case "Uncommon":
+		return uncommonRarityStyle.Render(rarity)
+	case "Rare":
+		return rareRarityStyle.Render(rarity)
+	case "Epic":
+		return epicRarityStyle.Render(rarity)
+	case "Legendary":
+		return legendaryRarityStyle.Render(rarity)
+	default:
+		return lipgloss.NewStyle().Render(rarity)
+	}
 }
 
 func checkbox(label string, checked bool) string {

@@ -22,6 +22,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			if k == "m" {
 				m.Chosen = false
+				m.Loaded = false
+				m.Progress = 0
+				m.Frames = 0
+				m.Ticks = 10
 				return m.updateChoices(msg)
 			}
 		}
@@ -147,7 +151,7 @@ func (m Model) updateChosen(msg tea.Msg) (Model, tea.Cmd) {
 				m.Progress = 1
 				m.Loaded = true
 				m.Ticks = 3
-				if m.Choice.Name == "" {
+				if m.Choice.Name == "Wander Around" {
 					rand.New(rand.NewSource(time.Now().UnixNano()))
 					item_1 := rand.Intn(len(m.ItemTable.Items))
 					item_2 := rand.Intn(len(m.ItemTable.Items))
@@ -171,7 +175,7 @@ func (m Model) updateChosen(msg tea.Msg) (Model, tea.Cmd) {
 				m.Loaded = false
 				m.Progress = 0
 				m.Frames = 0
-				m.Ticks = 100
+				m.Ticks = 10
 				return m, tick()
 			}
 			m.Ticks--
