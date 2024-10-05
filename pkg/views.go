@@ -115,7 +115,6 @@ func chosenView(m Model) string {
 				items = append(items, fmt.Sprintf("%s %s\n%s", renderRarity(item.Rarity), keywordStyle.Render(item.Name), subtleStyle.Render(item.Desc)))
 			}
 			msg = "Inventory: \n\n" + strings.Join(items, "\n")
-			m.Loaded = true
 			m.Ticks = 500
 		default:
 			msg = "You do something. It's a good something."

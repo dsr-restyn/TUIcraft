@@ -132,7 +132,7 @@ func (m Model) updateChoices(msg tea.Msg) (Model, tea.Cmd) {
 		m.Ticks--
 		if m.Ticks <= 0 {
 			m.Chosen = true
-			m.Ticks = 100
+			m.Ticks = 10
 		}
 		return m, tick()
 	}
@@ -143,7 +143,7 @@ func (m Model) updateChosen(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg.(type) {
 	case frameMsg:
 		log.Printf("frameMsg received: %d", m.Frames)
-		if !m.Loaded {
+		if !m.Loaded && m.Choice.Pbar {
 			divisor := 100
 			m.Frames++
 			m.Progress = ease.OutBounce(float64(m.Frames) / float64(divisor))

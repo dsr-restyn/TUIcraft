@@ -41,6 +41,7 @@ type (
 	Choice struct {
 		Name string
 		Id   int
+		Pbar bool
 	}
 
 	Choices struct {
@@ -227,8 +228,8 @@ func InitalModel() Model {
 	initalMenuChoices := MenuChoices{
 		Choices: Choices{
 			[]Choice{
-				{Name: "New Game", Id: 1},
-				{Name: "Load Game", Id: 2},
+				{Name: "New Game", Id: 1, Pbar: false},
+				{Name: "Load Game", Id: 2, Pbar: false},
 			},
 		},
 	}
@@ -236,12 +237,12 @@ func InitalModel() Model {
 	initalGameChoices := GameChoices{
 		Choices: Choices{
 			[]Choice{
-				{Name: "Wander Around", Id: 1},
-				{Name: "Fight Some Stuff", Id: 2},
-				{Name: "Talk to a Stranger", Id: 3},
-				{Name: "Take a Nap", Id: 4},
-				{Name: "Craft", Id: 5},
-				{Name: "View Inventory", Id: 6},
+				{Name: "Wander Around", Id: 1, Pbar: true},
+				{Name: "Fight Some Stuff", Id: 2, Pbar: true},
+				{Name: "Talk to a Stranger", Id: 3, Pbar: true},
+				{Name: "Take a Nap", Id: 4, Pbar: true},
+				{Name: "Craft", Id: 5, Pbar: false},
+				{Name: "View Inventory", Id: 6, Pbar: false},
 			},
 		},
 	}
