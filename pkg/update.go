@@ -176,6 +176,10 @@ func (m Model) updateChosen(msg tea.Msg) (Model, tea.Cmd) {
 				m.Progress = 0
 				m.Frames = 0
 				m.Ticks = 10
+				err := m.savePlayer()
+				if err != nil {
+					log.Printf("Failed to save player: %v", m.Player)
+				}
 				return m, tick()
 			}
 			m.Ticks--

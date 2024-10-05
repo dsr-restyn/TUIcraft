@@ -120,7 +120,7 @@ func chosenView(m Model) string {
 			msg = "You do something. It's a good something."
 		}
 		if m.Loaded {
-			label = fmt.Sprintf("\n%s, returning to menu in %s seconds...", done, ticksStyle.Render(fmt.Sprintf("%d", m.Ticks)))
+			label = fmt.Sprintf("%s\n\nreturning to menu in %s seconds...", done, ticksStyle.Render(fmt.Sprintf("%d", m.Ticks)))
 			return msg + "\n\n" + label + "\n\n" + progressbar(m.Progress) + "%"
 		} else {
 			msg += "\n\n" + subtleStyle.Render("Loading...") + dotStyle
