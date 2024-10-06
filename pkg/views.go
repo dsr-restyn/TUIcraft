@@ -66,7 +66,7 @@ func newGameView(m Model) string {
 func gameChoicesView(m Model) string {
 	c := m.Choice
 
-	tpl := "\nWelcome, %s: Let's Begin\n\n"
+	tpl := "\nWelcome, %s The %s: Let's Begin\n\n"
 	tpl += "%s\n\n"
 	tpl += "Task Completes in %s seconds\n\n"
 	tpl += subtleStyle.Render(" Use j/k to select") + dotStyle + subtleStyle.Render("Press enter to confirm") + dotStyle + subtleStyle.Render("Press q, esc, or ctrl+c to quit")
@@ -77,7 +77,7 @@ func gameChoicesView(m Model) string {
 		choices += checkbox(choice.Name, c.Id == choice.Id)
 	}
 
-	return fmt.Sprintf(tpl, m.Player.Name, choices, ticksStyle.Render(fmt.Sprintf("%d", m.Ticks)))
+	return fmt.Sprintf(tpl, m.Player.Name, m.Player.Role, choices, ticksStyle.Render(fmt.Sprintf("%d", m.Ticks)))
 }
 
 func chosenView(m Model) string {

@@ -153,7 +153,8 @@ func (m Model) updateChosen(msg tea.Msg) (Model, tea.Cmd) {
 				m.Progress = 1
 				m.Loaded = true
 				m.Ticks = 3
-				if m.Choice.Name == "Wander Around" {
+				switch m.Choice.Name {
+				case "Wander Around":
 					rand.New(rand.NewSource(time.Now().UnixNano()))
 					item_1 := rand.Intn(len(m.ItemTable.Items))
 					item_2 := rand.Intn(len(m.ItemTable.Items))
@@ -166,6 +167,8 @@ func (m Model) updateChosen(msg tea.Msg) (Model, tea.Cmd) {
 					m.ItemTable.Items[item_3].Rarity = rarity_3
 					m.DroppedItems = []Item{m.ItemTable.Items[item_1], m.ItemTable.Items[item_2], m.ItemTable.Items[item_3]}
 					m.Player.Inventory = append(m.Player.Inventory, m.DroppedItems...)
+				default:
+					return m, tick()
 				}
 				return m, tick()
 			}

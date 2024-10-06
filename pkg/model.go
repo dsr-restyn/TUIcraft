@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"encoding/json"
+	"math/rand"
 	"os"
 	"time"
 
@@ -70,19 +71,24 @@ type (
 	CombatEntity struct {
 		Name  string
 		Stats stats
+		Gold  int
+		Items []Item
 	}
 
 	stats struct {
-		Health     int
-		Mana       int
-		Level      int
-		Experience float64
+		Health int
+		Mana   int
+		Level  int
+		Dmg    int
+		Def    int
+		Exp    float64
 	}
 
 	Player struct {
 		Name      string
 		Role      string
 		Stats     stats
+		Gold      int
 		Inventory []Item
 	}
 )
@@ -120,20 +126,21 @@ func (cs Choices) GetChoiceById(id int) Choice {
 
 // Model
 type Model struct {
-	Choice       Choice
-	Chosen       bool
-	Ticks        int
-	Frames       int
-	Progress     float64
-	Loaded       bool
-	Quitting     bool
-	MenuChoices  MenuChoices
-	GameChoices  GameChoices
-	ItemTable    ItemTable
-	DroppedItems []Item
-	inputs       []textinput.Model
-	focused      int
-	Player       Player
+	Choice           Choice
+	Chosen           bool
+	Ticks            int
+	Frames           int
+	Progress         float64
+	Loaded           bool
+	Quitting         bool
+	MenuChoices      MenuChoices
+	GameChoices      GameChoices
+	ItemTable        ItemTable
+	CombatEncounters []CombatEntity
+	DroppedItems     []Item
+	inputs           []textinput.Model
+	focused          int
+	Player           Player
 }
 
 func tick() tea.Cmd {
@@ -213,17 +220,40 @@ func (m *Model) previousChoice(choices Choices) {
 func (m *Model) InitPlayer() {
 	m.Player = Player{
 		Stats: stats{
-			Health:     20,
-			Mana:       5,
-			Level:      1,
-			Experience: 0,
+			Health: 20,
+			Mana:   5,
+			Level:  1,
+			Dmg:    5,
+			Def:    2,
+			Exp:    0,
 		},
+		Gold:      0,
 		Inventory: []Item{},
 	}
 }
 
+func InitEncounters() []CombatEntity {
+	var encounters []CombatEntity
+	for i := 0; i < 5; i++ {
+		encounter := CombatEntity{
+			Name: "Goblin",
+			Stats: stats{
+				Health: 10,
+				Mana:   0,
+				Level:  1,
+				Dmg:    3,
+				Def:    1,
+				Exp:    10,
+			},
+			Gold: rand.New(rand.NewSource(time.Now().Unix())).Intn(50),
+		}
+		encounters = append(encounters, encounter)
+	}
+	return encounters
+}
+
 func InitalModel() Model {
-	initalItemTable := ItemTable{
+	initItemTable := ItemTable{
 		Items: []Item{
 			{Name: "Crazy Orb", Desc: "Makes ya crazy!", SalePrice: 1000},
 			{Name: "Magic Sword", Desc: "Slice and Dice", SalePrice: 500},
@@ -236,7 +266,7 @@ func InitalModel() Model {
 		},
 	}
 
-	initalMenuChoices := MenuChoices{
+	initMenuChoices := MenuChoices{
 		Choices: Choices{
 			[]Choice{
 				{Name: "New Game", Id: 1, Pbar: false},
@@ -245,18 +275,21 @@ func InitalModel() Model {
 		},
 	}
 
-	initalGameChoices := GameChoices{
+	initGameChoices := GameChoices{
 		Choices: Choices{
 			[]Choice{
 				{Name: "Wander Around", Id: 1, Pbar: true},
 				{Name: "Fight Some Stuff", Id: 2, Pbar: true},
 				{Name: "Talk to a Stranger", Id: 3, Pbar: true},
 				{Name: "Take a Nap", Id: 4, Pbar: true},
-				{Name: "Craft", Id: 5, Pbar: false},
-				{Name: "View Inventory", Id: 6, Pbar: false},
+				{Name: "Go to The Store", Id: 5, Pbar: false},
+				{Name: "Craft", Id: 6, Pbar: false},
+				{Name: "View Inventory", Id: 7, Pbar: false},
 			},
 		},
 	}
+
+	initEncounters := InitEncounters()
 
 	var inputs []textinput.Model = make([]textinput.Model, 2)
 	inputs[Name] = textinput.New()
@@ -272,18 +305,19 @@ func InitalModel() Model {
 	inputs[Role].CharLimit = 10
 
 	return Model{
-		Choice:      initalMenuChoices.Choices.ChoicesSlice[0],
-		Chosen:      false,
-		Ticks:       10,
-		Frames:      0,
-		Progress:    0,
-		Loaded:      false,
-		Quitting:    false,
-		MenuChoices: initalMenuChoices,
-		GameChoices: initalGameChoices,
-		ItemTable:   initalItemTable,
-		Player:      Player{},
-		inputs:      inputs,
-		focused:     0,
+		Choice:           initMenuChoices.Choices.ChoicesSlice[0],
+		Chosen:           false,
+		Ticks:            10,
+		Frames:           0,
+		Progress:         0,
+		Loaded:           false,
+		Quitting:         false,
+		MenuChoices:      initMenuChoices,
+		GameChoices:      initGameChoices,
+		CombatEncounters: initEncounters,
+		ItemTable:        initItemTable,
+		Player:           Player{},
+		inputs:           inputs,
+		focused:          0,
 	}
 }
