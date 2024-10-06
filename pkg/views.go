@@ -108,6 +108,9 @@ func chosenView(m Model) string {
 			msg = "You take a nap. It's a good nap."
 		case "Craft":
 			msg = "You craft something. It's a good craft."
+		case "Go to The Store":
+			msg = "You visit the store, what would you like to do?"
+			label = subtleStyle.Render("Press F to sell all")
 		case "View Inventory":
 			label = "Viewing Inventory...\n\n"
 			var items []string
@@ -115,6 +118,7 @@ func chosenView(m Model) string {
 				items = append(items, fmt.Sprintf("%s %s\n%s", renderRarity(item.Rarity), keywordStyle.Render(item.Name), subtleStyle.Render(item.Desc)))
 			}
 			msg = "Inventory: \n\n" + strings.Join(items, "\n")
+			msg += fmt.Sprintf("\n\n Gold: %d", m.Player.Gold)
 			m.Ticks = 500
 		default:
 			msg = "You do something. It's a good something."

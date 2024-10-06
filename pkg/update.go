@@ -13,8 +13,8 @@ import (
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// Quit
 	if msg, ok := msg.(tea.KeyMsg); ok {
+		k := msg.String()
 		if m.Choice.Name != "New Game" {
-			k := msg.String()
 			if k == "q" || k == "esc" || k == "ctrl+c" {
 				m.Quitting = true
 				return m, tea.Quit
@@ -27,6 +27,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.Frames = 0
 				m.Ticks = 10
 				return m.updateChoices(msg)
+			}
+		}
+
+		if m.Choice.Name == "Go to The Store" {
+			if k == "F" {
+				m.Player.Gold = m.Player.LiquidateInventory()
+				return m.updateChosen(msg)
 			}
 		}
 	}
@@ -183,7 +190,12 @@ func (m Model) updateChosen(msg tea.Msg) (Model, tea.Cmd) {
 				m.Ticks = 10
 				err := m.savePlayer()
 				if err != nil {
-					log.Printf("Failed to save player: %v", m.Player)
+					log.Printf("Failed to save player: %v", err)
+				} else {
+					err := m.saveModel()
+					if err != nil {
+						log.Printf("Failed to save model: %v", err)
+					}
 				}
 				return m, tick()
 			}

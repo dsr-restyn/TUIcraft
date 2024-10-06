@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"encoding/json"
+	"log"
 	"math/rand"
 	"os"
 	"time"
@@ -97,6 +98,16 @@ func (p Player) IsLoaded() bool {
 	return p.Name != "" && p.Role != ""
 }
 
+func (p *Player) LiquidateInventory() int {
+	gold := p.Gold
+	for _, item := range p.Inventory {
+		gold = gold + item.SalePrice
+	}
+	p.Inventory = []Item{}
+	log.Printf("Liquidating, gold earned: %d", gold)
+	return gold
+}
+
 func (cs Choices) contains(choice Choice) bool {
 	for _, c := range cs.ChoicesSlice {
 		if c == choice {
@@ -179,6 +190,16 @@ func (m *Model) loadPlayer() error {
 
 	decoder := json.NewDecoder(file)
 	return decoder.Decode(&m.Player)
+}
+
+func (m *Model) saveModel() error {
+	file, err := os.Create("model_save.json")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	encoder := json.NewEncoder(file)
+	return encoder.Encode(m)
 }
 
 // nextInput focuses the next input field
