@@ -67,14 +67,23 @@ type (
 		Items []Item
 	}
 
-	Player struct {
-		Name       string
-		Role       string
+	CombatEntity struct {
+		Name  string
+		Stats stats
+	}
+
+	stats struct {
 		Health     int
 		Mana       int
 		Level      int
 		Experience float64
-		Inventory  []Item
+	}
+
+	Player struct {
+		Name      string
+		Role      string
+		Stats     stats
+		Inventory []Item
 	}
 )
 
@@ -203,11 +212,13 @@ func (m *Model) previousChoice(choices Choices) {
 
 func (m *Model) InitPlayer() {
 	m.Player = Player{
-		Health:     20,
-		Mana:       5,
-		Level:      1,
-		Experience: 0,
-		Inventory:  []Item{},
+		Stats: stats{
+			Health:     20,
+			Mana:       5,
+			Level:      1,
+			Experience: 0,
+		},
+		Inventory: []Item{},
 	}
 }
 

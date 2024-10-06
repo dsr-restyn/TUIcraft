@@ -69,6 +69,7 @@ func (m Model) updateInputs(msg tea.Msg) (Model, tea.Cmd) {
 			switch msg.Type {
 			case tea.KeyEnter:
 				if m.focused == len(m.inputs)-1 {
+					m.InitPlayer()
 					m.Player.Name = m.inputs[0].Value()
 					m.Player.Role = m.inputs[1].Value()
 					if err := m.savePlayer(); err != nil {
