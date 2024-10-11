@@ -76,32 +76,57 @@ type (
 	}
 
 	CombatEntity struct {
-		Name  string
-		Stats stats
-		Gold  int
-		Items []Item
+		Name    string
+		Stats   Stats
+		Gold    int
+		Items   []Item
+		IsAlive bool
 	}
 
-	stats struct {
-		Health int
-		Mana   int
-		Level  int
-		Dmg    int
-		Def    int
-		Exp    float64
+	Stats struct {
+		Health   int
+		Mana     int
+		Level    int
+		Dmg      int
+		Def      int
+		DmgTaken int
+		Exp      float64
 	}
 
 	Player struct {
 		Name      string
 		Role      string
-		Stats     stats
+		Stats     Stats
 		Gold      int
 		Inventory []Item
+		IsAlive   bool
 	}
 )
 
 func (p Player) IsLoaded() bool {
 	return p.Name != "" && p.Role != ""
+}
+
+func (p Player) StartCombat(c CombatEntity) Player {
+	total_player_dmg := p.Stats.Dmg - c.Stats.Def
+	c.Stats.DmgTaken = total_player_dmg
+
+	total_creature_dmg := c.Stats.Dmg - p.Stats.Def
+	if !c.Stats.CheckAlive() {
+		c.IsAlive = false
+		return p
+	}
+	p.Stats.DmgTaken = total_creature_dmg
+
+	return p
+
+}
+
+func (s Stats) CheckAlive() bool {
+	if s.DmgTaken >= s.Health {
+		return false
+	}
+	return true
 }
 
 func (p *Player) LiquidateInventory() int {
@@ -246,16 +271,18 @@ func (m *Model) previousChoice(choices Choices) {
 
 func (m *Model) InitPlayer() {
 	m.Player = Player{
-		Stats: stats{
-			Health: 20,
-			Mana:   5,
-			Level:  1,
-			Dmg:    5,
-			Def:    2,
-			Exp:    0,
+		Stats: Stats{
+			Health:   20,
+			Mana:     5,
+			Level:    1,
+			Dmg:      5,
+			Def:      2,
+			DmgTaken: 0,
+			Exp:      0,
 		},
 		Gold:      0,
 		Inventory: []Item{},
+		IsAlive:   true,
 	}
 }
 
@@ -264,15 +291,17 @@ func InitEncounters() []CombatEntity {
 	for i := 0; i < 5; i++ {
 		encounter := CombatEntity{
 			Name: "Goblin",
-			Stats: stats{
-				Health: 10,
-				Mana:   0,
-				Level:  1,
-				Dmg:    3,
-				Def:    1,
-				Exp:    10,
+			Stats: Stats{
+				Health:   10,
+				Mana:     0,
+				Level:    1,
+				Dmg:      3,
+				Def:      1,
+				DmgTaken: 0,
+				Exp:      10,
 			},
-			Gold: rand.New(rand.NewSource(time.Now().Unix())).Intn(50),
+			Gold:    rand.New(rand.NewSource(time.Now().Unix())).Intn(50),
+			IsAlive: true,
 		}
 		encounters = append(encounters, encounter)
 	}
@@ -281,11 +310,8 @@ func InitEncounters() []CombatEntity {
 
 func InitalModel() Model {
 	initItemTable := initItemTable()
-
 	initMainMenu := initMainMenu()
-
 	initGameMenu := initGameMenu()
-
 	initEncounters := InitEncounters()
 
 	var inputs []textinput.Model = make([]textinput.Model, 2)
