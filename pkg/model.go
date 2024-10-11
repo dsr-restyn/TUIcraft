@@ -280,43 +280,11 @@ func InitEncounters() []CombatEntity {
 }
 
 func InitalModel() Model {
-	initItemTable := ItemTable{
-		Items: []Item{
-			{Name: "Crazy Orb", Desc: "Makes ya crazy!", SalePrice: 1000},
-			{Name: "Magic Sword", Desc: "Slice and Dice", SalePrice: 500},
-			{Name: "Golden Key", Desc: "Must open a Golden Door", SalePrice: 250},
-			{Name: "Rusty Dagger", Desc: "Like a nice dagger, except rusty", SalePrice: 50},
-			{Name: "Shiny Shield", Desc: "You can see your face in it", SalePrice: 100},
-			{Name: "Old Book", Desc: "Dusty", SalePrice: 25},
-			{Name: "Strange Potion", Desc: "What IS a normal potion?", SalePrice: 200},
-			{Name: "Silver Coin", Desc: "Not a gold coin", SalePrice: 10},
-		},
-	}
+	initItemTable := initItemTable()
 
-	initMenuChoices := Menu{
-		Choices: Choices{
-			[]Choice{
-				{Name: "New Game", Id: 1, Pbar: false},
-				{Name: "Load Game", Id: 2, Pbar: false},
-			},
-		},
-		Name: "Main Menu",
-	}
+	initMainMenu := initMainMenu()
 
-	initGameChoices := Menu{
-		Choices: Choices{
-			[]Choice{
-				{Name: "Wander Around", Id: 1, Pbar: true},
-				{Name: "Fight Some Stuff", Id: 2, Pbar: true},
-				{Name: "Talk to a Stranger", Id: 3, Pbar: true},
-				{Name: "Take a Nap", Id: 4, Pbar: true},
-				{Name: "Go to The Store", Id: 5, Pbar: false},
-				{Name: "Craft", Id: 6, Pbar: false},
-				{Name: "View Inventory", Id: 7, Pbar: false},
-			},
-		},
-		Name: "Game Menu",
-	}
+	initGameMenu := initGameMenu()
 
 	initEncounters := InitEncounters()
 
@@ -334,19 +302,66 @@ func InitalModel() Model {
 	inputs[Role].CharLimit = 10
 
 	return Model{
-		Choice:           initMenuChoices.Choices.ChoicesSlice[0],
+		Choice:           initMainMenu.Choices.ChoicesSlice[0],
 		Chosen:           false,
 		Ticks:            10,
 		Frames:           0,
 		Progress:         0,
 		Loaded:           false,
 		Quitting:         false,
-		MainMenu:         initMenuChoices,
-		GameMenu:         initGameChoices,
+		MainMenu:         initMainMenu,
+		GameMenu:         initGameMenu,
 		CombatEncounters: initEncounters,
 		ItemTable:        initItemTable,
 		Player:           Player{},
 		inputs:           inputs,
 		focused:          0,
 	}
+}
+
+func initItemTable() ItemTable {
+	initItemTable := ItemTable{
+		Items: []Item{
+			{Name: "Crazy Orb", Desc: "Makes ya crazy!", SalePrice: 1000},
+			{Name: "Magic Sword", Desc: "Slice and Dice", SalePrice: 500},
+			{Name: "Golden Key", Desc: "Must open a Golden Door", SalePrice: 250},
+			{Name: "Rusty Dagger", Desc: "Like a nice dagger, except rusty", SalePrice: 50},
+			{Name: "Shiny Shield", Desc: "You can see your face in it", SalePrice: 100},
+			{Name: "Old Book", Desc: "Dusty", SalePrice: 25},
+			{Name: "Strange Potion", Desc: "What IS a normal potion?", SalePrice: 200},
+			{Name: "Silver Coin", Desc: "Not a gold coin", SalePrice: 10},
+		},
+	}
+	return initItemTable
+}
+
+func initMainMenu() Menu {
+	initMainMenu := Menu{
+		Choices: Choices{
+			[]Choice{
+				{Name: "New Game", Id: 1, Pbar: false},
+				{Name: "Load Game", Id: 2, Pbar: false},
+			},
+		},
+		Name: "Main Menu",
+	}
+	return initMainMenu
+}
+
+func initGameMenu() Menu {
+	initGameMenu := Menu{
+		Choices: Choices{
+			[]Choice{
+				{Name: "Wander Around", Id: 1, Pbar: true},
+				{Name: "Fight Some Stuff", Id: 2, Pbar: true},
+				{Name: "Talk to a Stranger", Id: 3, Pbar: true},
+				{Name: "Take a Nap", Id: 4, Pbar: true},
+				{Name: "Go to The Store", Id: 5, Pbar: false},
+				{Name: "Craft", Id: 6, Pbar: false},
+				{Name: "View Inventory", Id: 7, Pbar: false},
+			},
+		},
+		Name: "Game Menu",
+	}
+	return initGameMenu
 }
