@@ -48,14 +48,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "Load Game":
 				m.loadPlayer()
 				m.Chosen = false
-				m.Choice = m.GameChoices.Choices.ChoicesSlice[0]
+				m.Choice = m.GameMenu.Choices.ChoicesSlice[0]
 				return m.updateChoices(msg)
 			}
 		}
 
 	} else {
-		if m.MenuChoices.Choices.contains(m.Choice) {
-			m.Choice = m.GameChoices.Choices.ChoicesSlice[0]
+		if m.MainMenu.Choices.contains(m.Choice) {
+			m.Choice = m.GameMenu.Choices.ChoicesSlice[0]
 			return m.updateChoices(msg)
 		} else {
 			if !m.Chosen {
@@ -108,22 +108,22 @@ func (m Model) updateInputs(msg tea.Msg) (Model, tea.Cmd) {
 func (m Model) updateChoices(msg tea.Msg) (Model, tea.Cmd) {
 	// TODO: Figure out more elegant way to handle player load state
 	c := m.Choice
-	inMenu := m.MenuChoices.Choices.contains(c)
+	inMenu := m.MainMenu.Choices.contains(c)
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "j", "down":
 			if inMenu {
-				m.nextChoice(m.MenuChoices.Choices)
+				m.nextChoice(m.MainMenu.Choices)
 			} else {
-				m.nextChoice(m.GameChoices.Choices)
+				m.nextChoice(m.GameMenu.Choices)
 				return m, frame()
 			}
 		case "k", "up":
 			if inMenu {
-				m.previousChoice(m.MenuChoices.Choices)
+				m.previousChoice(m.MainMenu.Choices)
 			} else {
-				m.previousChoice(m.GameChoices.Choices)
+				m.previousChoice(m.GameMenu.Choices)
 				return m, frame()
 			}
 		case "q", "esc", "ctrl+c":

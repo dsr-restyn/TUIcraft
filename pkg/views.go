@@ -17,18 +17,18 @@ func (m Model) View() string {
 
 	if m.Player.Name == "" {
 		if !m.Chosen {
-			s = menuChoicesView(m)
+			s = MainMenuView(m)
 		} else {
 			switch m.Choice.Name {
 			case "New Game":
 				s = newGameView(m)
 			case "Load Game":
-				s = menuChoicesView(m)
+				s = MainMenuView(m)
 			}
 		}
 	} else {
 		if !m.Chosen {
-			s = gameChoicesView(m)
+			s = GameMenuView(m)
 		} else {
 			s = chosenView(m)
 		}
@@ -36,13 +36,13 @@ func (m Model) View() string {
 	return mainStyle.Render("\n" + s + "\n\n")
 }
 
-func menuChoicesView(m Model) string {
+func MainMenuView(m Model) string {
 	tpl := "Welcome to the TuiCraft!\n\n"
 	tpl += "%s\n\n"
 	tpl += subtleStyle.Render(" Use j/k to select") + dotStyle + subtleStyle.Render("Press enter to confirm") + dotStyle + subtleStyle.Render("Press q, esc, or ctrl+c to quit")
 	c := m.Choice.Id
 	var choices string
-	for _, choice := range m.MenuChoices.Choices.ChoicesSlice {
+	for _, choice := range m.MainMenu.Choices.ChoicesSlice {
 		choices += "\n"
 		choices += checkbox(choice.Name, c == choice.Id)
 	}
@@ -63,7 +63,7 @@ func newGameView(m Model) string {
 	return fmt.Sprintf(tpl, strings.Join(textFields, "\n"))
 }
 
-func gameChoicesView(m Model) string {
+func GameMenuView(m Model) string {
 	c := m.Choice
 
 	tpl := "\nWelcome, %s The %s: Let's Begin\n\n"
@@ -72,7 +72,7 @@ func gameChoicesView(m Model) string {
 	tpl += subtleStyle.Render(" Use j/k to select") + dotStyle + subtleStyle.Render("Press enter to confirm") + dotStyle + subtleStyle.Render("Press q, esc, or ctrl+c to quit")
 
 	var choices string
-	for _, choice := range m.GameChoices.Choices.ChoicesSlice {
+	for _, choice := range m.GameMenu.Choices.ChoicesSlice {
 		choices += "\n"
 		choices += checkbox(choice.Name, c.Id == choice.Id)
 	}
@@ -85,7 +85,7 @@ func chosenView(m Model) string {
 	label := m.Choice.Name
 	done := "Done!"
 
-	if m.GameChoices.Choices.contains(m.Choice) {
+	if m.GameMenu.Choices.contains(m.Choice) {
 		switch m.Choice.Name {
 		case "Wander Around":
 			msg = "Wandering around...\n\n"
@@ -132,7 +132,7 @@ func chosenView(m Model) string {
 
 		}
 	} else {
-		return menuChoicesView(m)
+		return MainMenuView(m)
 	}
 
 }

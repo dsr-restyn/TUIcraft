@@ -50,6 +50,12 @@ type (
 		ChoicesSlice []Choice
 	}
 
+	Menu struct {
+		Name    string
+		Choices Choices
+		Chosen  bool
+	}
+
 	MenuChoices struct {
 		Choices Choices
 	}
@@ -144,8 +150,8 @@ type Model struct {
 	Progress         float64
 	Loaded           bool
 	Quitting         bool
-	MenuChoices      MenuChoices
-	GameChoices      GameChoices
+	MainMenu         Menu
+	GameMenu         Menu
 	ItemTable        ItemTable
 	CombatEncounters []CombatEntity
 	DroppedItems     []Item
@@ -287,16 +293,17 @@ func InitalModel() Model {
 		},
 	}
 
-	initMenuChoices := MenuChoices{
+	initMenuChoices := Menu{
 		Choices: Choices{
 			[]Choice{
 				{Name: "New Game", Id: 1, Pbar: false},
 				{Name: "Load Game", Id: 2, Pbar: false},
 			},
 		},
+		Name: "Main Menu",
 	}
 
-	initGameChoices := GameChoices{
+	initGameChoices := Menu{
 		Choices: Choices{
 			[]Choice{
 				{Name: "Wander Around", Id: 1, Pbar: true},
@@ -308,6 +315,7 @@ func InitalModel() Model {
 				{Name: "View Inventory", Id: 7, Pbar: false},
 			},
 		},
+		Name: "Game Menu",
 	}
 
 	initEncounters := InitEncounters()
@@ -333,8 +341,8 @@ func InitalModel() Model {
 		Progress:         0,
 		Loaded:           false,
 		Quitting:         false,
-		MenuChoices:      initMenuChoices,
-		GameChoices:      initGameChoices,
+		MainMenu:         initMenuChoices,
+		GameMenu:         initGameChoices,
 		CombatEncounters: initEncounters,
 		ItemTable:        initItemTable,
 		Player:           Player{},
