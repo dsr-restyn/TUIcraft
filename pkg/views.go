@@ -101,7 +101,8 @@ func chosenView(m Model) string {
 				)
 			}
 		case "Fight Some Stuff":
-			msg = "You fight some stuff. It's a good time."
+			done = fmt.Sprintf("You fought a %s!", keywordStyle.Render(m.CombatEncounters[0].Name))
+			msg = fmt.Sprintf("You fight a %s", m.CombatEncounters[0].Name)
 		case "Talk to a Stranger":
 			msg = "You talk to a stranger. They're strange."
 		case "Take a Nap":
