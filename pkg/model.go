@@ -41,9 +41,10 @@ type (
 
 type (
 	Choice struct {
-		Name string
-		Id   int
-		Pbar bool
+		Name    string
+		Id      int
+		Pbar    bool
+		Divisor int
 	}
 
 	Choices struct {
@@ -365,8 +366,8 @@ func initMainMenu() Menu {
 	initMainMenu := Menu{
 		Choices: Choices{
 			[]Choice{
-				{Name: "New Game", Id: 1, Pbar: false},
-				{Name: "Load Game", Id: 2, Pbar: false},
+				{Name: "New Game", Id: 1, Pbar: false, Divisor: 1},
+				{Name: "Load Game", Id: 2, Pbar: false, Divisor: 1},
 			},
 		},
 		Name: "Main Menu",
@@ -378,13 +379,13 @@ func initGameMenu() Menu {
 	initGameMenu := Menu{
 		Choices: Choices{
 			[]Choice{
-				{Name: "Wander Around", Id: 1, Pbar: true},
-				{Name: "Fight Some Stuff", Id: 2, Pbar: true},
-				{Name: "Talk to a Stranger", Id: 3, Pbar: true},
-				{Name: "Take a Nap", Id: 4, Pbar: true},
-				{Name: "Go to The Store", Id: 5, Pbar: false},
-				{Name: "Craft", Id: 6, Pbar: false},
-				{Name: "View Inventory", Id: 7, Pbar: false},
+				{Name: "Wander Around", Id: 1, Pbar: true, Divisor: 150},
+				{Name: "Fight Some Stuff", Id: 2, Pbar: true, Divisor: 100},
+				{Name: "Talk to a Stranger", Id: 3, Pbar: true, Divisor: 100},
+				{Name: "Take a Nap", Id: 4, Pbar: true, Divisor: 100},
+				{Name: "Go to The Store", Id: 5, Pbar: false, Divisor: 100},
+				{Name: "Craft", Id: 6, Pbar: false, Divisor: 100},
+				{Name: "View Inventory", Id: 7, Pbar: false, Divisor: 100},
 			},
 		},
 		Name: "Game Menu",

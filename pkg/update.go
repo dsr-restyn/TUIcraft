@@ -153,7 +153,7 @@ func (m Model) updateChosen(msg tea.Msg) (Model, tea.Cmd) {
 	case frameMsg:
 		log.Printf("frameMsg received: %d", m.Frames)
 		if !m.Loaded && m.Choice.Pbar {
-			divisor := 100
+			divisor := m.Choice.Divisor
 			m.Frames++
 			m.Progress = ease.OutBounce(float64(m.Frames) / float64(divisor))
 			if m.Progress >= 1 {
