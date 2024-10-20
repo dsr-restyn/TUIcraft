@@ -379,7 +379,7 @@ func initGameMenu() Menu {
 	initGameMenu := Menu{
 		Choices: Choices{
 			[]Choice{
-				{Name: "Wander Around", Id: 1, Pbar: true, Divisor: 150},
+				{Name: "Wander Around", Id: 1, Pbar: true, Divisor: 200},
 				{Name: "Fight Some Stuff", Id: 2, Pbar: true, Divisor: 100},
 				{Name: "Talk to a Stranger", Id: 3, Pbar: true, Divisor: 100},
 				{Name: "Take a Nap", Id: 4, Pbar: true, Divisor: 100},
