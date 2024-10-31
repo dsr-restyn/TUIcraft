@@ -68,7 +68,11 @@ func GameMenuView(m Model) string {
 
 	tpl := "\nWelcome, %s The %s: Let's Begin\n\n"
 	tpl += "%s\n\n"
-	tpl += "Task Completes in %s seconds\n\n"
+	if !m.Chosen {
+		tpl += "Auto-Selecting in %s seconds\n\n"
+	} else {
+		tpl += "Task Completes in %s seconds\n\n"
+	}
 	tpl += subtleStyle.Render(" Use j/k to select") + dotStyle + subtleStyle.Render("Press enter to confirm") + dotStyle + subtleStyle.Render("Press q, esc, or ctrl+c to quit")
 
 	var choices string

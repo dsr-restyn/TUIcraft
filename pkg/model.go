@@ -289,7 +289,7 @@ func (m *Model) InitPlayer() {
 
 func InitEncounters() []CombatEntity {
 	var encounters []CombatEntity
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 1; i++ {
 		encounter := CombatEntity{
 			Name: "Goblin",
 			Stats: Stats{
@@ -305,6 +305,21 @@ func InitEncounters() []CombatEntity {
 			IsAlive: true,
 		}
 		encounters = append(encounters, encounter)
+		other_encounter := CombatEntity{
+			Name: "Boblin",
+			Stats: Stats{
+				Health:   10,
+				Mana:     0,
+				Level:    1,
+				Dmg:      3,
+				Def:      1,
+				DmgTaken: 0,
+				Exp:      10,
+			},
+			Gold:    rand.New(rand.NewSource(time.Now().Unix())).Intn(50),
+			IsAlive: true,
+		}
+		encounters = append(encounters, other_encounter)
 	}
 	return encounters
 }

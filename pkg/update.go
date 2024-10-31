@@ -174,6 +174,9 @@ func (m Model) updateChosen(msg tea.Msg) (Model, tea.Cmd) {
 					m.ItemTable.Items[item_3].Rarity = rarity_3
 					m.DroppedItems = []Item{m.ItemTable.Items[item_1], m.ItemTable.Items[item_2], m.ItemTable.Items[item_3]}
 					m.Player.Inventory = append(m.Player.Inventory, m.DroppedItems...)
+				// case "Fight Some Stuff":
+				// // fight some stuff
+				// 	a := m.Player
 				default:
 					return m, tick()
 				}
