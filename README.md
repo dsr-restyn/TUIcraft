@@ -47,4 +47,4 @@ go run main.go
 ```
 
 ## Contributing
-This project is a work in progress. It will probably never see updates but it was fun to work on.
+This project is a work in progress. It will probably never see updates, so don't bother contributing, but it was fun to work on and wanted to share what I cooked up.
